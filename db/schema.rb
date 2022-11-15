@@ -10,9 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_11_14_150222) do
+ActiveRecord::Schema[7.0].define(version: 2022_11_15_160744) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "confirm_recoveries", primary_key: ["inpatient_prefix", "inpatient_novem_digit"], force: :cascade do |t|
+    t.string "inpatient_prefix", limit: 3, null: false
+    t.string "inpatient_novem_digit", limit: 9, null: false
+    t.date "discharge_date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "departments", primary_key: "did", id: { type: :string, limit: 20 }, force: :cascade do |t|
     t.string "title", limit: 30
@@ -34,6 +42,39 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_14_150222) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "dept_code", limit: 20
+  end
+
+  create_table "examination_diagnoses", primary_key: ["date_n_time", "doctor_code", "out_patient_prefix", "out_patient_novem_digit", "diagnosis"], force: :cascade do |t|
+    t.datetime "date_n_time", null: false
+    t.string "doctor_code", limit: 20, null: false
+    t.string "out_patient_prefix", limit: 3, null: false
+    t.string "out_patient_novem_digit", limit: 9, null: false
+    t.string "diagnosis", limit: 300, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "examinations", primary_key: ["date_n_time", "doctor_code", "out_patient_prefix", "out_patient_novem_digit"], force: :cascade do |t|
+    t.datetime "date_n_time", null: false
+    t.string "doctor_code", limit: 20, null: false
+    t.string "out_patient_prefix", limit: 3, null: false
+    t.string "out_patient_novem_digit", limit: 9, null: false
+    t.decimal "fee", precision: 13, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "has_next_examinations", primary_key: ["date_n_time", "doctor_code", "out_patient_prefix", "out_patient_novem_digit"], force: :cascade do |t|
+    t.datetime "date_n_time", null: false
+    t.string "doctor_code", limit: 20, null: false
+    t.string "out_patient_prefix", limit: 3, null: false
+    t.string "out_patient_novem_digit", limit: 9, null: false
+    t.datetime "nxt_exam_datetime", null: false
+    t.string "nxt_exam_doctor_code", limit: 20, null: false
+    t.string "nxt_exam_out_patient_prefix", limit: 3, null: false
+    t.string "nxt_exam_out_patient_novem_digit", limit: 9, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "in_patient_diagnoses", primary_key: ["prefix", "novem_digit", "diagnosis"], force: :cascade do |t|
@@ -81,9 +122,21 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_14_150222) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "treatments", primary_key: ["start_datetime", "end_datetime", "doctor_code", "inpatient_prefix", "inpatient_novem_digit"], force: :cascade do |t|
+    t.datetime "start_datetime", null: false
+    t.datetime "end_datetime", null: false
+    t.string "doctor_code", limit: 20, null: false
+    t.string "inpatient_prefix", limit: 3, null: false
+    t.string "inpatient_novem_digit", limit: 9, null: false
+    t.text "result"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   add_foreign_key "departments", "employees", column: "dean_unique_code", primary_key: "unique_code"
   add_foreign_key "employees", "departments", column: "dept_code", primary_key: "did"
   add_foreign_key "in_patient_diagnoses", "in_patients", column: "prefix", primary_key: "prefix", name: "in_patient_diagnoses_prefix_novem_digit_fkey"
+  add_foreign_key "in_patient_diagnoses", "in_patients", column: "prefix", primary_key: "prefix", name: "in_patient_diagnoses_prefix_novem_digit_fkey1"
   add_foreign_key "in_patients", "employees", column: "nurse_unique_code", primary_key: "unique_code"
   add_foreign_key "phones", "employees", column: "owner_code", primary_key: "unique_code"
 end
