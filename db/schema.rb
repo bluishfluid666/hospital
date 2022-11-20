@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_11_15_160744) do
+ActiveRecord::Schema[7.0].define(version: 2022_11_18_142634) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -102,6 +102,25 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_15_160744) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "medication_effects", primary_key: ["mid", "effect"], force: :cascade do |t|
+    t.string "mid", limit: 20, null: false
+    t.string "effect", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "medications", primary_key: "mid", id: { type: :string, limit: 20 }, force: :cascade do |t|
+    t.string "name", null: false
+    t.decimal "price", precision: 11, scale: 2, null: false
+    t.date "expiration_date", null: false
+    t.integer "quantity", null: false
+    t.datetime "imported_datetime", null: false
+    t.decimal "imported_price", precision: 11, scale: 2, null: false
+    t.string "provider_number", limit: 20, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "out_patients", primary_key: ["prefix", "novem_digit"], force: :cascade do |t|
     t.string "prefix", limit: 3, null: false
     t.string "novem_digit", limit: 9, null: false
@@ -122,6 +141,14 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_15_160744) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "providers", primary_key: "pid", id: { type: :string, limit: 20 }, force: :cascade do |t|
+    t.string "name", null: false
+    t.string "phone_number", null: false
+    t.string "address", limit: 100
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "treatments", primary_key: ["start_datetime", "end_datetime", "doctor_code", "inpatient_prefix", "inpatient_novem_digit"], force: :cascade do |t|
     t.datetime "start_datetime", null: false
     t.datetime "end_datetime", null: false
@@ -129,6 +156,29 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_15_160744) do
     t.string "inpatient_prefix", limit: 3, null: false
     t.string "inpatient_novem_digit", limit: 9, null: false
     t.text "result"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "use_examination_medications", primary_key: ["date_time", "doctor_code", "out_patient_prefix", "out_patient_novem_digit", "med_id"], force: :cascade do |t|
+    t.datetime "date_time", null: false
+    t.string "doctor_code", null: false
+    t.string "out_patient_prefix", limit: 3, null: false
+    t.string "out_patient_novem_digit", limit: 9, null: false
+    t.string "med_id", limit: 20, null: false
+    t.integer "prescribed_qnt", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "use_treatment_medications", primary_key: ["start_datetime", "end_datetime", "doctor_code", "inpatient_prefix", "inpatient_novem_digit", "med_id"], force: :cascade do |t|
+    t.datetime "start_datetime", null: false
+    t.datetime "end_datetime", null: false
+    t.string "doctor_code", null: false
+    t.string "inpatient_prefix", limit: 3, null: false
+    t.string "inpatient_novem_digit", limit: 9, null: false
+    t.string "med_id", limit: 20, null: false
+    t.integer "prescribed_qnt", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
