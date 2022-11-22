@@ -1,3 +1,3 @@
 class InPatient < ApplicationRecord
-  self.primary_key = :prefix, :novem_digit
+  self.primary_key = :novem_digit
 end
