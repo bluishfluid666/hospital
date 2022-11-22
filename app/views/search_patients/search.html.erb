@@ -1,2 +1,84 @@
-<%= @result1 %>
-<%= @result2 %>
+<% if !@result1.nil? %>
+  <h1>In patients:</h1>
+  <% if @result1.empty? %>
+    <p>No result</p>
+  <% else %>
+      <style type="text/css">
+      .tg  {border-collapse:collapse;border-spacing:0;}
+      .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+        overflow:hidden;padding:10px 5px;word-break:normal;}
+      .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+        font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+      .tg .tg-73oq{border-color:#000000;text-align:left;vertical-align:top}
+      .tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
+      </style>
+      <table class="tg">
+      <thead>
+      <tr>
+        <th>No</th>
+        <th>Full name</th>
+        <th>Phone number</th>
+        <th>Start Date and Time</th>
+        <th>End Date and Time</th>
+        <th>Result</th>
+      </tr>
+      </thead>
+      <tbody>
+    <% @result1.each.with_index do |r,i| %>
+        <tr>
+        <td><%= "#{i+1}" %></td>
+      <% r.each do |p| %>
+        <% if p.nil? %>
+          <td class="tg-73oq">NULL</td>
+        <% else %>
+          <td class="tg-73oq"><%= p %></td>
+        <% end %>
+      <% end %>
+        </tr>
+    <% end %>
+  <% end %>
+      </tbody>
+      </table>
+<% end %>
+<% if !@result2.nil? %>
+  <h1>Out patients:</h1>
+  <% if @result2.empty? %>
+    <p>No result</p>
+  <% else %>
+      <style type="text/css">
+      .tg  {border-collapse:collapse;border-spacing:0;}
+      .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+        overflow:hidden;padding:10px 5px;word-break:normal;}
+      .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+        font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+      .tg .tg-73oq{border-color:#000000;text-align:left;vertical-align:top}
+      .tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
+      </style>
+      <table class="tg">
+      <thead>
+      <tr>
+        <th>No</th>
+        <th>Full name</th>
+        <th>Phone number</th>
+        <th>Start Date and Time</th>
+        <th>End Date and Time</th>
+        <th>Result</th>
+      </tr>
+      </thead>
+      <tbody>
+    <% @result2.each.with_index do |r,i| %>
+        <tr>
+        <td><%= "#{i+1}" %></td>
+      <% r.each do |p| %>
+        <% if p.nil? %>
+          <td class="tg-73oq">NULL</td>
+        <% else %>
+          <td class="tg-73oq"><%= p %></td>
+        <% end %>
+      <% end %>
+        </tr>
+    <% end %>
+  <% end %>
+      </tbody>
+      </table>
+<% end %>
