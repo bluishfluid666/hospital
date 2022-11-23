@@ -12,7 +12,7 @@ class SearchPatientsController < ApplicationController
       phone_no = ''
       addr = ''
       if params["patient_name"] != ''
-        name = "lower(first_name) like '%#{params["patient_name"]}%' or lower(last_name) like '%#{params["patient_name"]}%'"
+        name = "(lower(first_name) like '%#{params["patient_name"]}%' or lower(last_name) like '%#{params["patient_name"]}%')"
       end
       if params["patient_phone_number"] != ''
         if name != ''
@@ -28,22 +28,47 @@ class SearchPatientsController < ApplicationController
       end
       if params["In patient"]
         raw = "
-        select first_name || ' ' || last_name as full_name, phone_number, start_datetime, end_datetime, result 
+        select prefix, novem_digit, first_name || ' ' || last_name as full_name, phone_number, start_datetime, end_datetime, result, date_of_admission, sickroom, fee, nurse_id, doctor_id 
         from in_patients left join treatments 
         on in_patients.prefix = treatments.inpatient_prefix and in_patients.novem_digit = treatments.inpatient_novem_digit 
         where #{name}#{phone_no}#{addr};
         "     
-        @result1 = ActiveRecord::Base.connection.execute(raw).values
-        render json: @result1
+        @result1 = Array.new
+        inpatients = ActiveRecord::Base.connection.execute(raw).values
+        inpatients.each.with_index do |i,p|
+          @result1[i]["prefix"] = p[0]
+          @result1[i]["n9_digit"] = p[1]
+          @result1[i]["full_name"] = p[2]
+          @result1[i]["phone"] = p[3]
+          @result1[i]["start_datetime"] = p[4]
+          @result1[i]["end_datetime"] = p[5]
+          @result1[i]["result"] = p[6]
+          @result1[i]["doa"] = p[7]
+          @result1[i]["sickroom"] = p[8]
+          @result1[i]["nurse_id"] = p[9]
+          @result1[i]["doctor_id"] = p[10]
+        end
+        @result1 = @result1.to_json
       end
       if params["Out patient"]
         raw = "
-        select first_name || ' ' || last_name as full_name, phone_number
-        from out_patients 
+        select prefix, novem_digit, first_name || ' ' || last_name as full_name, phone_number, date_n_time, doctor_id, fee
+        from out_patients left join examinations on out_patients.novem_digit = examinations.out_patient_novem_digit
         where #{name}#{phone_no}#{addr};
         "
-        @result2 = ActiveRecord::Base.connection.execute(raw).values
-        render json: @result2
+        @result2 = Array.new
+        outpatients = ActiveRecord::Base.connection.execute(raw).values
+        outpatients.each.with_index do |p,i|
+          @result2[i] = Hash.new
+          @result2[i]["prefix"] = p[0]
+          @result2[i]["n9_digit"] = p[1]
+          @result2[i]["full_name"] = p[2]
+          @result2[i]["phone"] = p[3]
+          @result2[i]["date_n_time"] = p[4]
+          @result2[i]["doctor_id"] = p[5]
+          @result2[i]["fee"] = p[6]
+        end
+        @result2 = @result2.to_json
       end
     end
   end

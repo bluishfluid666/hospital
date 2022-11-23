@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_11_22_015113) do
+ActiveRecord::Schema[7.0].define(version: 2022_11_22_155440) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -82,8 +82,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_22_015113) do
     t.string "address", limit: 100, null: false
     t.date "date_of_admission", null: false
     t.string "sickroom", limit: 10, null: false
-    t.decimal "fee", precision: 13, scale: 2
-    t.integer "nurse_id"
+    t.decimal "fee", precision: 13, scale: 2, null: false
+    t.integer "nurse_id", null: false
   end
 
   create_table "medication_effects", primary_key: ["med_id", "effect"], force: :cascade do |t|

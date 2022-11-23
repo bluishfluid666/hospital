@@ -11,8 +11,8 @@ class CreateInPatients < ActiveRecord::Migration[7.0]
       t.string :address, limit: 100, null: false
       t.date :date_of_admission, null: false
       t.string :sickroom, null: false, limit: 10
-      t.decimal :fee, precision: 13, scale: 2
-      t.integer :nurse_id
+      t.decimal :fee, precision: 13, scale: 2, null: false
+      t.integer :nurse_id, null: false
     end
     execute "alter table in_patients add primary key (prefix, novem_digit);"
   end
