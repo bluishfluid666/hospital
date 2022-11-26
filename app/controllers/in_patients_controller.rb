@@ -1,5 +1,5 @@
 class InPatientsController < ApplicationController
-  @@identifier = 0
+  @@identifier = 10
   def create
     @@identifier += 1
     novem = "0"

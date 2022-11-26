@@ -13,10 +13,13 @@
   <%= f.text_field :address %>
   <br>
   <%= label_tag 'gender' %>
-  <%= select_tag 'gender', raw("<option value=\"m\">Male</option><option value=\"f\">Female</option>") %>
+  <%= select_tag 'gender', raw("<option value=\"M\">Male</option><option value=\"F\">Female</option>") %>
   <br>
   <%= f.label :dob, "Date of Birth" %>
   <%= f.date_field :dob %>
   <br>
   <%= f.submit "Register" %>
 <% end %>
+
+
+

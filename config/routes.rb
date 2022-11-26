@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "articles#index"
   get '/search', to: 'search_patients#search'
+  get '/payment', to: 'get_payment#index'
   
   resources :get_doctor_patients, only: [:index]
   resources :in_patients, param: :novem_digit, only: [:create]

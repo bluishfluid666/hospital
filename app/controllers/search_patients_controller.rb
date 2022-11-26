@@ -7,12 +7,13 @@ class SearchPatientsController < ApplicationController
       if params["Out patient"]
         @result2 = Array.new
       end
+      render json: [@result1, @result2]
     else
       name = ''
       phone_no = ''
       addr = ''
       if params["patient_name"] != ''
-        name = "(lower(first_name) like '%#{params["patient_name"]}%' or lower(last_name) like '%#{params["patient_name"]}%')"
+        name = "(lower(first_name) like '%#{params["patient_name"].downcase}%' or lower(last_name) like '%#{params["patient_name"].downcase}%')"
       end
       if params["patient_phone_number"] != ''
         if name != ''
@@ -35,7 +36,8 @@ class SearchPatientsController < ApplicationController
         "     
         @result1 = Array.new
         inpatients = ActiveRecord::Base.connection.execute(raw).values
-        inpatients.each.with_index do |i,p|
+        inpatients.each.with_index do |p,i|
+          @result1[i] = Hash.new
           @result1[i]["prefix"] = p[0]
           @result1[i]["n9_digit"] = p[1]
           @result1[i]["full_name"] = p[2]
@@ -48,7 +50,6 @@ class SearchPatientsController < ApplicationController
           @result1[i]["nurse_id"] = p[9]
           @result1[i]["doctor_id"] = p[10]
         end
-        @result1 = @result1.to_json
       end
       if params["Out patient"]
         raw = "
@@ -68,7 +69,13 @@ class SearchPatientsController < ApplicationController
           @result2[i]["doctor_id"] = p[5]
           @result2[i]["fee"] = p[6]
         end
-        @result2 = @result2.to_json
+      end
+      if @result1 && @result2
+        render json: @result1+@result2
+      elsif @result1
+        render json: @result1
+      elsif @result2
+        render json: @result2
       end
     end
   end

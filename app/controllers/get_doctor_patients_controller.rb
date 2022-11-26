@@ -2,23 +2,53 @@ class GetDoctorPatientsController < ApplicationController
   def index
     doctor_id = params["doctor"]
     inpatients = "
-select * 
-from in_patients 
-where novem_digit in (
-select distinct inpatient_novem_digit from treatments where doctor_id = #{doctor_id}
-);"
+    select in_patients.prefix, in_patients.novem_digit, first_name, last_name, gender, dob, phone_number, address, date_of_admission, sickroom, fee, nurse_id, t.start_datetime, t.end_datetime, t.doctor_id,  t.result, t.med_id, t.name, t.prescribed_qnt 
+    from in_patients
+    inner join (
+      select treatments.start_datetime, treatments.end_datetime, treatments.inpatient_novem_digit, treatments.doctor_id,  result, 	med_id, name, prescribed_qnt
+      from treatments
+      inner join (
+      select * 
+      from use_treatment_medications um
+      left join medications m
+      on um.med_id = m.mid
+      ) utm 
+      on treatments.inpatient_novem_digit = utm.inpatient_novem_digit
+      where treatments.doctor_id = #{doctor_id}
+      ) t
+    on in_patients.novem_digit = t.inpatient_novem_digit;
+    "
     outpatients = "
-select * 
-from out_patients 
-where novem_digit in (
-select distinct out_patient_novem_digit from examinations where doctor_id = #{doctor_id}
-);"
+    select prefix, novem_digit, first_name, last_name, gender, dob, phone_number, address, ae.date_n_time, ae.doctor_id, ae.diagnosis, ae.name as med_name, ae.prescribed_qnt, ae.nxt_exam_datetime, ae.nxt_exam_doctor_id
+    from out_patients op
+    join (
+      select d.date_n_time, d.out_patient_prefix, d.out_patient_novem_digit, d.doctor_id, d.diagnosis, d.name, d.prescribed_qnt, hne.nxt_exam_datetime, hne.nxt_exam_doctor_id
+      from (
+        select e.date_n_time, e.doctor_id, e.out_patient_prefix, e.out_patient_novem_digit, e.fee, ed.diagnosis, uem.name, 		uem.prescribed_qnt
+        from examinations e
+        inner join examination_diagnoses ed
+        on e.out_patient_novem_digit = ed.out_patient_novem_digit and e.date_n_time = ed.date_n_time and e.doctor_id = 				ed.doctor_id
+        left join (
+          select * 
+          from use_examination_medications um
+          left join medications m
+          on um.med_id = m.mid
+        ) uem
+        on uem.date_n_time = e.date_n_time and uem.doctor_id = e.doctor_id and uem.out_patient_novem_digit = 					e.out_patient_novem_digit
+        where e.doctor_id = #{doctor_id}
+      ) d
+      left join has_next_examinations hne
+      on d.date_n_time = hne.date_n_time and d.doctor_id = hne.doctor_id and d.out_patient_novem_digit = hne.out_patient_novem_digit
+    ) ae
+    on ae.out_patient_novem_digit = op.novem_digit;
+    "
     @inpatients = Array.new
     @outpatients = Array.new
 
     inpatients_arr = ActiveRecord::Base.connection.execute(inpatients).values
     inpatients_arr.each.with_index do |e,i|
       @inpatients[i] = Hash.new
+      @inpatients[i]["prefix"] = e[0]
       @inpatients[i]["n9_digit"] = e[1]
       @inpatients[i]["fname"] = e[2]
       @inpatients[i]["lname"] = e[3]
@@ -30,8 +60,15 @@ select distinct out_patient_novem_digit from examinations where doctor_id = #{do
       @inpatients[i]["sickroom"] = e[9]
       @inpatients[i]["fee"] = e[10]
       @inpatients[i]["nurse_id"] = e[11]
+      @inpatients[i]["start_dt"] = e[12]
+      @inpatients[i]["end_dt"] = e[13]
+      @inpatients[i]["doctor_id"] = e[14]
+      @inpatients[i]["result"] = e[15]
+      @inpatients[i]["med_id"] = e[16]
+      @inpatients[i]["med_name"] = e[17]
+      @inpatients[i]["prescribed_qnt"] = e[18]
     end
-    @inpatients = @inpatients.to_json
+    # @inpatients = @inpatients.to_json
 
     outpatients_arr = ActiveRecord::Base.connection.execute(outpatients).values
     outpatients_arr.each.with_index do |e,i|
@@ -44,7 +81,18 @@ select distinct out_patient_novem_digit from examinations where doctor_id = #{do
       @outpatients[i]["dob"] = e[5]
       @outpatients[i]["phone"] = e[6]
       @outpatients[i]["address"] = e[7]
+      @outpatients[i]["date_n_time"] = e[8]
+      @outpatients[i]["doctor_id"] = e[9]
+      @outpatients[i]["diagnosis"] = e[10]
+      @outpatients[i]["med_name"] = e[11]
+      @outpatients[i]["prescribe_qnt"] = e[12]
+      @outpatients[i]["nxt_exam_dt"] = e[13]
+      @outpatients[i]["nxt_exam_doctor_id"] = e[14]
     end
-    @outpatients = @outpatients.to_json
+    # @outpatients = @outpatients.to_json
+    @return_obj = @inpatients + @outpatients
+    # render json: @inpatients
+    render json: @return_obj
   end
 end
+    
