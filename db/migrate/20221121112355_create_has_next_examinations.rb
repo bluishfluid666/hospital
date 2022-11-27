@@ -6,7 +6,7 @@ class CreateHasNextExaminations < ActiveRecord::Migration[7.0]
       t.string :out_patient_prefix, limit: 3, null: false
       t.string :out_patient_novem_digit, limit: 9, null: false
       t.datetime :nxt_exam_datetime, null: false
-      t.string :nxt_exam_doctor_id, limit: 9, null: false
+      t.integer :nxt_exam_doctor_id, null: false
       t.string :nxt_exam_out_patient_prefix, limit: 3, null: false
       t.string :nxt_exam_out_patient_novem_digit, limit: 9, null: false
     end
