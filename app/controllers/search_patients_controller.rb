@@ -73,16 +73,16 @@ class SearchPatientsController < ApplicationController
       if params["patient_name"]
         params["patient_name"].downcase!
       end
-      if params["patient_name"] != ''
+      if params["patient_name"] 
         name = "(lower(first_name) like '%#{params["patient_name"]}%' or lower(last_name) like '%#{params["patient_name"]}%')"
       end
-      if params["patient_phone_number"] != ''
+      if params["patient_phone_number"] 
         if name != ''
           phone_no = ' and ' 
         end
         phone_no += "phone_number = '#{params["patient_phone_number"]}'"
       end
-      if params["patient_address"] != ''
+      if params["patient_address"] 
         if name != '' || phone_no != ''
           addr = ' and '
         end
