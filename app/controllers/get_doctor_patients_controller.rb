@@ -2,45 +2,33 @@ class GetDoctorPatientsController < ApplicationController
   def index
     doctor_id = params["doctor"]
     inpatients = "
-    select in_patients.prefix, in_patients.novem_digit, first_name, last_name, gender, dob, phone_number, address, date_of_admission, sickroom, fee, nurse_id, t.start_datetime, t.end_datetime, t.doctor_id,  t.result, t.med_id, t.name, t.prescribed_qnt 
+    select in_patients.prefix, in_patients.novem_digit, first_name, last_name, gender, dob, phone_number, address, date_of_admission, sickroom, fee, nurse_id, t.start_datetime, t.end_datetime, t.doctor_id,  t.result 
     from in_patients
     inner join (
-      select treatments.start_datetime, treatments.end_datetime, treatments.inpatient_novem_digit, treatments.doctor_id,  result, 	med_id, name, prescribed_qnt
+      select treatments.start_datetime, treatments.end_datetime, treatments.inpatient_novem_digit, treatments.doctor_id,  result
       from treatments
-      inner join (
-      select * 
-      from use_treatment_medications um
-      left join medications m
-      on um.med_id = m.mid
-      ) utm 
-      on treatments.inpatient_novem_digit = utm.inpatient_novem_digit
       where treatments.doctor_id = #{doctor_id}
       ) t
     on in_patients.novem_digit = t.inpatient_novem_digit;
+
     "
     outpatients = "
-    select prefix, novem_digit, first_name, last_name, gender, dob, phone_number, address, ae.date_n_time, ae.doctor_id, ae.diagnosis, ae.name as med_name, ae.prescribed_qnt, ae.nxt_exam_datetime, ae.nxt_exam_doctor_id
+    select prefix, novem_digit, first_name, last_name, gender, dob, phone_number, address, 	ae.date_n_time, ae.doctor_id, ae.diagnosis, ae.nxt_exam_datetime, ae.nxt_exam_doctor_id
     from out_patients op
     join (
-      select d.date_n_time, d.out_patient_prefix, d.out_patient_novem_digit, d.doctor_id, d.diagnosis, d.name, d.prescribed_qnt, hne.nxt_exam_datetime, hne.nxt_exam_doctor_id
+      select d.date_n_time, d.out_patient_prefix, d.out_patient_novem_digit, d.doctor_id, d.diagnosis, hne.nxt_exam_datetime, hne.nxt_exam_doctor_id
       from (
-        select e.date_n_time, e.doctor_id, e.out_patient_prefix, e.out_patient_novem_digit, e.fee, ed.diagnosis, uem.name, 		uem.prescribed_qnt
+        select e.date_n_time, e.doctor_id, e.out_patient_prefix, e.out_patient_novem_digit, e.fee, ed.diagnosis
         from examinations e
         inner join examination_diagnoses ed
         on e.out_patient_novem_digit = ed.out_patient_novem_digit and e.date_n_time = ed.date_n_time and e.doctor_id = 				ed.doctor_id
-        left join (
-          select * 
-          from use_examination_medications um
-          left join medications m
-          on um.med_id = m.mid
-        ) uem
-        on uem.date_n_time = e.date_n_time and uem.doctor_id = e.doctor_id and uem.out_patient_novem_digit = 					e.out_patient_novem_digit
         where e.doctor_id = #{doctor_id}
       ) d
       left join has_next_examinations hne
       on d.date_n_time = hne.date_n_time and d.doctor_id = hne.doctor_id and d.out_patient_novem_digit = hne.out_patient_novem_digit
     ) ae
     on ae.out_patient_novem_digit = op.novem_digit;
+
     "
     @inpatients = Array.new
     @outpatients = Array.new
@@ -96,3 +84,6 @@ class GetDoctorPatientsController < ApplicationController
   end
 end
     
+
+
+
