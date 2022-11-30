@@ -52,9 +52,6 @@ class GetDoctorPatientsController < ApplicationController
       @inpatients[i]["end_dt"] = e[13]
       @inpatients[i]["doctor_id"] = e[14]
       @inpatients[i]["result"] = e[15]
-      @inpatients[i]["med_id"] = e[16]
-      @inpatients[i]["med_name"] = e[17]
-      @inpatients[i]["prescribed_qnt"] = e[18]
     end
     # @inpatients = @inpatients.to_json
 
@@ -72,10 +69,8 @@ class GetDoctorPatientsController < ApplicationController
       @outpatients[i]["date_n_time"] = e[8]
       @outpatients[i]["doctor_id"] = e[9]
       @outpatients[i]["diagnosis"] = e[10]
-      @outpatients[i]["med_name"] = e[11]
-      @outpatients[i]["prescribe_qnt"] = e[12]
-      @outpatients[i]["nxt_exam_dt"] = e[13]
-      @outpatients[i]["nxt_exam_doctor_id"] = e[14]
+      @outpatients[i]["nxt_exam_dt"] = e[11]
+      @outpatients[i]["nxt_exam_doctor_id"] = e[12]
     end
     # @outpatients = @outpatients.to_json
     @return_obj = @inpatients + @outpatients
